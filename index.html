@@ -1,526 +1,367 @@
 <!doctype html>
-<html lang="pl">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NAK!S — producent muzyczny</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0b0b0b; /* dark */
-      --panel:#0f0f10;
-      --text:#fff;
-      --accent:#e21b1b; /* red */
-      --muted:#b5b5b5;
-      --glass: rgba(255,255,255,0.03);
-      --grad-1: linear-gradient(135deg,#420000 0%, #a30000 50%, #ff3b3b 100%);
-      --shadow: 0 10px 30px rgba(0,0,0,0.7);
-      --glow: 0 0 18px rgba(226,27,27,0.25);
-      --mode: dark;
-      --transition-fast: 300ms cubic-bezier(.2,.9,.3,1);
-      --transition-slow: 700ms cubic-bezier(.2,.9,.3,1);
-      --mx: 0;
-      --my: 0;
-    }
-    /* light mode vars override */
-    :root.light{
-      --bg: #f6f6f7;
-      --panel: #ffffff;
-      --text: #0b0b0b;
-      --muted:#333;
-      --glass: rgba(0,0,0,0.03);
-      --grad-1: linear-gradient(135deg,#ffeded 0%, #ffd6d6 50%, #ffbcbc 100%);
-      --shadow: 0 8px 24px rgba(0,0,0,0.08);
-      --glow: 0 0 18px rgba(226,27,27,0.12);
-      --mode: light;
-    }
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NAK!S — demo upload</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b0b; --panel:#0f0f10; --text:#fff; --muted:#b5b5b5; --accent:#e21b1b;
+  --shadow: 0 10px 30px rgba(0,0,0,0.65);
+  --glow: 0 0 18px rgba(226,27,27,0.25);
+  --border: rgba(255,255,255,0.06);
+  --transition-fast: 260ms ease;
+  --transition-slow: 700ms ease;
+}
+:root.light{
+  --bg:#f6f6f7; --panel:#fff; --text:#111; --muted:#444; --glow:0 0 14px rgba(226,27,27,0.12); --border: rgba(0,0,0,0.08);
+}
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      background: radial-gradient(circle at 10% 10%, rgba(226,27,27,0.06), transparent 8%), var(--bg);
-      color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      transition: background var(--transition-slow), color var(--transition-fast);
-      overflow-x:hidden;
-    }
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);transition:background var(--transition-slow),color var(--transition-fast);overflow-x:hidden}
+a{color:var(--accent)}
 
-    /* Centered hero with huge NAK!S */
-    .hero{
-      height:100vh;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      position:relative;
-      padding:clamp(16px,4vw,40px);
-    }
+/* hero */
+.hero{height:92vh;display:grid;place-items:center;text-align:center;padding:20px;position:relative;overflow:visible}
+.logo{font-family:Montserrat, sans-serif;font-size:clamp(48px,14vw,160px);font-weight:900;letter-spacing:.02em;cursor:pointer;transition:transform .36s cubic-bezier(.2,.9,.3,1), filter .36s}
+.logo-gradient{background:linear-gradient(90deg,var(--accent) 50%, var(--text) 50%);-webkit-background-clip:text;color:transparent}
+.subtitle{margin-top:10px;color:var(--muted);font-weight:600}
 
-    .logo{
-      font-family: Montserrat, sans-serif;
-      font-weight:900;
-      font-size:clamp(48px, 12vw, 180px);
-      letter-spacing:0.02em;
-      line-height:0.85;
-      cursor:pointer;
-      user-select:none;
-      display:inline-block;
-      padding:12px 20px;
-      border-radius:18px;
-      transform:translateZ(0);
-      transition:transform var(--transition-fast), filter var(--transition-fast);
-      text-shadow: 0 6px 30px rgba(0,0,0,0.6);
-      box-shadow: var(--shadow);
-    }
+/* controls */
+.controls{position:fixed;right:16px;top:16px;display:flex;gap:10px;z-index:60}
+.btn{background:var(--panel);color:var(--text);border-radius:12px;padding:8px 12px;border:1px solid var(--border);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:transform var(--transition-fast)}
+.btn:active{transform:translateY(2px)}
 
-    /* Keep exact text but add split coloring */
-    .logo.split{
-      position:relative;
-      color:var(--text);
-      background: linear-gradient(90deg, var(--accent) 50%, var(--text) 50%);
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-    }
+/* container */
+.container{max-width:1100px;margin:0 auto;padding:28px}
 
-    .hero .subtitle{
-      margin-top:12px;
-      font-weight:600;
-      color:var(--muted);
-      letter-spacing:0.02em;
-      font-size: clamp(14px, 2.4vw, 20px);
-    }
+/* card */
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:24px;border-radius:14px;border:1px solid var(--border);margin-bottom:26px;box-shadow:var(--shadow)}
+h2{font-family:Montserrat;margin:0 0 12px 0}
 
-    /* Top controls */
-    .controls{
-      position:fixed;
-      right:18px;
-      top:18px;
-      display:flex;
-      gap:12px;
-      z-index:60;
-      align-items:center;
-    }
-    .btn{
-      background:var(--panel);
-      color:var(--text);
-      border:1px solid rgba(255,255,255,0.04);
-      padding:8px 12px;
-      border-radius:12px;
-      font-weight:600;
-      cursor:pointer;
-      box-shadow: var(--shadow);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
-    }
-    .btn:active{transform:translateY(2px)}
+/* bio */
+.bio-flex{display:flex;gap:18px;flex-wrap:wrap}
+.bio-text{flex:1;min-width:240px;line-height:1.6}
+.bio-avatar{width:200px;height:200px;border-radius:14px;background:linear-gradient(135deg, rgba(226,27,27,0.15), rgba(0,0,0,0.18));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:48px;color:var(--text);box-shadow:var(--glow),var(--shadow)}
 
-    .toggle{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      padding:6px;
-    }
+/* timeline */
+.timeline{overflow-x:auto;padding-bottom:10px}
+.timeline-line{height:4px;background:var(--border);margin:26px 0;border-radius:4px}
+.timeline-items{display:flex;gap:36px;min-width:680px;padding:8px}
+.dot{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:transform .2s,filter .2s}
+.point{width:18px;height:18px;border-radius:999px;background:var(--panel);border:2px solid var(--border);transition:all .2s}
+.year{font-weight:700;color:var(--muted)}
+.dot.active .point{transform:scale(1.6);background:var(--accent);box-shadow:var(--glow)}
+.dot.active .year{color:var(--accent)}
 
-    /* main content area */
-    .content{
-      max-width:1100px;
-      margin: 0 auto 120px;
-      padding: 40px 24px;\      transform: translateY(calc(var(--my) * 0.01px)) translateX(calc(var(--mx) * 0.01px));
-      transition: transform 400ms linear;
-    }
+/* detail */
+.detail-box{margin-top:14px;padding:16px;border-radius:10px;border:2px solid var(--accent);background:rgba(0,0,0,0.46);display:none}
+.detail-box.show{display:block}
 
-    section.card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 45%);
-      border-radius:18px;
-      padding:28px;
-      margin-bottom:34px;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(255,255,255,0.03);
-      backdrop-filter: blur(6px);
-    }
+/* drop */
+.drop-zone{border:2px dashed var(--border);padding:22px;border-radius:12px;text-align:center;min-height:120px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.file-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
 
-    h2{font-family: Montserrat, Inter, sans-serif; margin:0 0 12px 0}
-    p.lead{color:var(--muted); margin:0 0 18px 0}
+/* progress */
+.progress-wrap{width:100%;background:linear-gradient(90deg, rgba(255,255,255,0.03), transparent);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.progress-bar{height:10px;width:0%;background:linear-gradient(90deg,var(--accent), #ff6b6b);transition:width .2s}
 
-    /* BIO */
-    .bio .strap{
-      font-size:18px;
-      font-weight:700;
-      display:inline-block;
-      padding:10px 16px;
-      border-radius:999px;
-      background:var(--grad-1);
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      box-shadow:var(--glow);
-    }
-    .bio .bio-grid{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+/* small */
+.small{font-size:13px;color:var(--muted)}
 
-    .bio .avatar{
-      height:220px;width:220px;border-radius:16px;background:linear-gradient(135deg, rgba(226,27,27,0.15), rgba(0,0,0,0.25));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:48px;color:var(--text);box-shadow:var(--glow), var(--shadow);
-    }
+/* animations and distortion */
+.fade-in{animation:fadeIn .6s both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-    /* Links */
-    .links .row{display:flex;gap:12px;flex-wrap:wrap}
-    .chip{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:var(--panel);font-weight:600}
+/* distortion overlay */
+.distort{position:fixed;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity 200ms}
+.distort.active{opacity:.9;animation:distortAnim .45s steps(8, end)}
+@keyframes distortAnim{
+  0%{filter:contrast(1) hue-rotate(0deg) blur(0px)}
+  50%{filter:contrast(1.2) hue-rotate(10deg) blur(1px)}
+  100%{filter:contrast(1) hue-rotate(0deg) blur(0px)}
+}
 
-    /* Timeline */
-    .timeline{
-      position:relative;padding:40px 20px 28px;overflow:auto;
-    }
-    .timeline-line{
-      height:4px;background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));position:relative;margin:40px 20px;
-    }
-    .dots{display:flex;gap:60px;align-items:center;padding:20px 20px;min-width:900px}
-    .dot{
-      position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:transform var(--transition-fast), filter var(--transition-fast);
-    }
-    .dot .point{width:18px;height:18px;border-radius:999px;background:var(--panel);border:2px solid rgba(255,255,255,0.06);box-shadow: 0 8px 18px rgba(0,0,0,0.5);transition:all var(--transition-fast)}
-    .dot .year{font-weight:700;color:var(--muted);font-size:14px;transition:transform var(--transition-fast), color var(--transition-fast)}
-
-    .dot.active .point{transform:scale(1.6);background:var(--accent);box-shadow: 0 0 24px rgba(226,27,27,0.45)}
-    .dot.active .year{color:var(--accent);transform:scale(1.08)}
-
-    .detail-box{
-      position:absolute;left:0;right:0;margin:auto;top:80px;max-width:620px;border-radius:12px;padding:16px;border:2px solid var(--accent);background:rgba(0,0,0,0.6);color:var(--text);display:none;z-index:30
-    }
-    .detail-box.show{display:block;animation:fadeIn .28s ease-out}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-    /* blur when timeline item hovered */\    .timeline.blurred .dots > *:not(.active){filter:blur(4px) grayscale(.6);opacity:.35;transform:scale(.98)}
-
-    /* Contact */
-    form{display:grid;gap:10px}
-    input,textarea{background:var(--panel);color:var(--text);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.04);min-height:44px}
-    .row-two{display:flex;gap:10px}
-
-    /* Drop demo */
-    .drop{border:2px dashed rgba(255,255,255,0.06);padding:20px;border-radius:12px;min-height:120px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
-    .file-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-    .file-item{padding:8px 10px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);display:flex;justify-content:space-between;align-items:center}
-
-    /* footer */
-    footer{color:var(--muted);text-align:center;padding:30px 8px}
-
-    /* Glitch effect */
-    .glitch-overlay{
-      pointer-events:none;position:fixed;inset:0;mix-blend-mode:multiply;opacity:0;transition:opacity 120ms linear;z-index:80
-    }
-    .glitch-overlay.active{opacity:1;animation:glitch 560ms steps(6, end)}
-    @keyframes glitch{
-      0%{clip-path:inset(0 0 0 0)}
-      20%{clip-path:inset(10% 0 60% 0)}
-      40%{clip-path:inset(40% 0 10% 0)}
-      60%{clip-path:inset(10% 0 40% 0)}
-      80%{clip-path:inset(30% 0 20% 0)}
-      100%{clip-path:inset(0 0 0 0)}
-    }
-
-    /* subtle floating animation */
-    .float{animation:floaty 6s ease-in-out infinite}
-    @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
-
-    /* responsive */
-    @media (max-width:900px){
-      .bio .bio-grid{grid-template-columns:1fr}
-      .dots{min-width:600px;gap:28px}
-    }
-
-  </style>
+/* responsive */
+@media (max-width:800px){
+  .hero{height:80vh}
+  .timeline-items{min-width:520px}
+  .bio-avatar{width:150px;height:150px;font-size:36px}
+}
+</style>
 </head>
 <body>
-  <div class="glitch-overlay" id="glitch"></div>
 
-  <div class="controls">
-    <button class="btn" id="jump">Przejdź ↓</button>
-    <div class="btn toggle" id="modeToggle" title="Przełącz tryb">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.9"><path d="M12 3v2M12 19v2M4.22 4.22 5.64 5.64M18.36 18.36 19.78 19.78M1 12h2M21 12h2M4.22 19.78 5.64 18.36M18.36 5.64 19.78 4.22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span style="font-weight:700">Light / Dark</span>
-    </div>
+<div class="distort" id="distort"></div>
+
+<!-- controls -->
+<div class="controls">
+  <button class="btn" id="toContent">Explore ↓</button>
+  <button class="btn" id="modeToggle">Light / Dark</button>
+</div>
+
+<!-- hero -->
+<section class="hero">
+  <div>
+    <div class="logo logo-gradient" id="logo">NAK!S</div>
+    <div class="subtitle small">Producer • Sound Designer • Audio Experimentalist</div>
   </div>
+</section>
 
-  <main>
-    <section class="hero">
-      <div>
-        <div class="logo split" id="logo">NAK!S</div>
-        <div class="subtitle">Beatmaker • Sound designer • Architect of emotions</div>
+<div class="container">
+
+  <!-- BIO -->
+  <section class="card fade-in">
+    <h2>Biography</h2>
+    <div class="bio-flex">
+      <div class="bio-text">
+        NAK!S grew from the crackle of a found vinyl sample into a full audio practice that treats sound like built space.
+        Working with modular synths, tape loops and field recordings, he sculpts layers that are simultaneously intimate and cinematic.
+        <br><br>
+        Over the years he collaborated with indie filmmakers, choreographers and underground labels — each project widening his palette:
+        from minimal textures to dense polyrhythms and immersive soundtracks. His approach: let the room breathe, but control the tension.
       </div>
-    </section>
+      <div class="bio-avatar">N!</div>
+    </div>
+  </section>
 
-    <div id="sections">
-      <div class="content">
+  <!-- TIMELINE -->
+  <section class="card fade-in">
+    <h2>Timeline</h2>
+    <div class="timeline">
+      <div class="timeline-line"></div>
 
-        <section class="card bio" id="bio">
-          <h2>Biografia <span class="strap">"Rytm w krwi, przestrzeń w głowie"</span></h2>
-          <p class="lead">NAK!S to producent, który łączy analogowe brzmienia z cyfrowym futurystycznym projektem. Tworzy dla filmów, artystów i własnych projektów — od przestrzennych pejzaży po uderzające bity klubowe.</p>
-          <div class="bio-grid">
-            <div>
-              <p>Zaczynał od sampla znalezionego na płycie winylowej, przerobił kawę w metrum i zbudował całą orkiestrę na syntezatorze. Jego produkcje balansują między minimalizmem a eksplozją detali — zawsze na granicy między melancholią a energią. W pracy korzysta z modularnych syntezatorów, taśmy, field-recordingu i programów DAW, aby każda ścieżka miała własną tożsamość.</p>
+      <div class="timeline-items" id="timelineItems">
+        <div class="dot" data-detail="2016 — Debut EP “Red Echo”: raw textures and intimate field recordings that started the local buzz.">
+          <div class="point"></div><div class="year">2016</div>
+        </div>
+        <div class="dot" data-detail="2018 — ‘Nocturnes’ collaboration brought cinematic audiences and international playlists.">
+          <div class="point"></div><div class="year">2018</div>
+        </div>
+        <div class="dot" data-detail="2020 — 'Tape & Code' series: merging tape saturation and algorithmic processing into live sets.">
+          <div class="point"></div><div class="year">2020</div>
+        </div>
+        <div class="dot" data-detail="2022 — ‘Pulse’ short film soundtrack; nominated for local sound design awards.">
+          <div class="point"></div><div class="year">2022</div>
+        </div>
+        <div class="dot" data-detail="2024 — 'Midnight Geometry': deep-tech LP exploring polyrhythms and spatialization.">
+          <div class="point"></div><div class="year">2024</div>
+        </div>
+      </div>
 
-              <p>Współpraca z artystami z różnych scen zaprowadziła go na sceny klubowe i do studiów nagraniowych. Jeżeli szukasz kogoś, kto zrobi twój utwór nieoczywistym — NAK!S to odpowiedź.</p>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
-              <div class="avatar float">N!</div>
-              <div style="text-align:center;color:var(--muted)">Kontakt &amp; pro mini-press kit</div>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <div class="chip">SoundCloud</div>
-                <div class="chip">Spotify</div>
-                <div class="chip">Bandcamp</div>
-              </div>
-            </div>
-          </div>
-        </section>
+      <div class="detail-box" id="detailBox">Click a year to view details.</div>
+    </div>
+  </section>
 
-        <section class="card timeline" id="timeline">
-          <h2>Timeline</h2>
-          <p class="lead">Kilka kamieni milowych — kliknij datę, aby zobaczyć szczegóły.</p>
+  <!-- LINKS -->
+  <section class="card fade-in">
+    <h2>Streaming & socials</h2>
+    <div class="small">Replace # with actual links in the final deployment</div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <a class="btn" href="#" style="text-decoration:none">Spotify</a>
+      <a class="btn" href="#" style="text-decoration:none">Apple Music</a>
+      <a class="btn" href="#" style="text-decoration:none">SoundCloud</a>
+      <a class="btn" href="#" style="text-decoration:none">Bandcamp</a>
+    </div>
+  </section>
 
-          <div class="timeline-line"></div>
-          <div class="dots" id="dots">
-            <!-- each dot has data-detail attribute -->
-            <div class="dot" data-year="2016" data-detail="Pierwsze publiczne wydanie: EP 'Red Echo' — surowe brzmienia, które przyciągnęły uwagę lokalnej sceny.">
-              <div class="point"></div>
-              <div class="year">2016</div>
-            </div>
+  <!-- CONTACT + DROP DEMO -->
+  <section class="card fade-in">
+    <h2>Contact & Drop demo</h2>
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <form id="contactForm">
+          <input name="name" placeholder="Your name" required />
+          <input name="email" placeholder="Email" type="email" required />
+          <input name="title" placeholder="Demo title / short note" />
+          <textarea name="message" rows="4" placeholder="Message (optional)"></textarea>
+        </form>
+        <div class="small" id="contactAck"></div>
+      </div>
 
-            <div class="dot" data-year="2018" data-detail="Współpraca z artystą X przy produkcji albumu 'Nocturnes' — brzmienie zyskało międzynarodowy rezonans.">
-              <div class="point"></div>
-              <div class="year">2018</div>
-            </div>
-
-            <div class="dot" data-year="2020" data-detail="Start projektu 'Tape & Code' — hybryda taśmy analogowej i komputerowej, która definiuje nową estetykę.">
-              <div class="point"></div>
-              <div class="year">2020</div>
-            </div>
-
-            <div class="dot" data-year="2022" data-detail="Ścieżka dźwiękowa do krótkometrażowego filmu 'Pulse' — nominacja do lokalnych nagród za najlepsze brzmienie.">
-              <div class="point"></div>
-              <div class="year">2022</div>
-            </div>
-
-            <div class="dot" data-year="2024" data-detail="'Midnight Geometry' — najnowsze wydawnictwo, eksperymenty z polirytmią i atmosferą.">
-              <div class="point"></div>
-              <div class="year">2024</div>
-            </div>
-
-          </div>
-
-          <div class="detail-box" id="detailBox">Kliknij lub najedź na datę, aby zobaczyć szczegóły.</div>
-        </section>
-
-        <section class="card links" id="links">
-          <h2>Linki do serwisów streamingowych & sociali</h2>
-          <p class="lead">Słuchaj, obserwuj, wsparcie — wszystko w jednym miejscu.</p>
-          <div class="row">
-            <a class="chip" href="#" role="button">Spotify</a>
-            <a class="chip" href="#" role="button">Apple Music</a>
-            <a class="chip" href="#" role="button">SoundCloud</a>
-            <a class="chip" href="#" role="button">Bandcamp</a>
-            <a class="chip" href="#" role="button">YouTube</a>
-            <a class="chip" href="#" role="button">Instagram</a>
-            <a class="chip" href="#" role="button">Twitter/X</a>
-          </div>
-        </section>
-
-        <section class="card contact" id="contact">
-          <h2>Formularz kontaktowy</h2>
-          <p class="lead">Masz pomysł na współpracę? Napisz — odpowiem możliwie szybko.</p>
-          <form id="contactForm">
-            <input type="text" name="name" placeholder="Imię i nazwisko" required />
-            <input type="email" name="email" placeholder="Email" required />
-            <input type="text" name="subject" placeholder="Temat" />
-            <textarea name="message" placeholder="Wiadomość" rows="5" required></textarea>
-            <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
-              <button class="btn" type="submit">Wyślij</button>
-              <div style="color:var(--muted);font-size:13px">Albo napisz: <a href="mailto:kontakt@nakis.example" style="color:var(--accent)">kontakt@nakis.example</a></div>
-            </div>
-          </form>
-          <div id="contactMsg" style="margin-top:12px;color:var(--muted)"></div>
-        </section>
-
-        <section class="card demo" id="dropDemo">
-          <h2>Drop demo</h2>
-          <p class="lead">Przeciągnij pliki tutaj lub wybierz. Maks. 3 pliki, do 50MB każdy. <strong>Upewnij się, że dodajesz metadane (tytuł, kontakt).</strong></p>
-          <div class="drop" id="dropArea">
-            <div>Przeciągnij i upuść pliki tutaj</div>
-            <div style="font-size:13px;color:var(--muted)">lub</div>
-            <label class="btn" style="cursor:pointer"><input id="fileInput" type="file" accept="audio/*" multiple style="display:none" /> Wybierz pliki</label>
-            <div class="file-list" id="fileList"></div>
-            <div style="display:flex;gap:10px;margin-top:8px">
-              <button class="btn" id="sendDemo">Wyślij demo</button>
-              <div style="color:var(--muted);font-size:13px;align-self:center">Wysyłanie symulowane (demo front-end)</div>
+      <div style="flex:1;min-width:300px">
+        <div id="drop" class="drop-zone">
+          <div>Drag & drop up to 3 audio files (max 50MB each)</div>
+          <div class="small">or</div>
+          <label class="btn" style="cursor:pointer"><input id="fileInput" type="file" accept="audio/*" multiple style="display:none"> Choose files</label>
+          <div class="file-list" id="fileList"></div>
+          <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+            <button id="uploadBtn" class="btn">Send demo</button>
+            <div style="flex:1">
+              <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
             </div>
           </div>
-        </section>
-
-        <footer>
-          © NAK!S — All rights reserved. Designed with ❤️ in red, black & white.
-        </footer>
-
+          <div class="small" id="uploadStatus"></div>
+        </div>
       </div>
     </div>
-  </main>
+  </section>
 
-  <script>
-    // Smooth scroll from hero to sections
-    const logo = document.getElementById('logo');
-    const jump = document.getElementById('jump');
-    const sections = document.getElementById('sections');
-    logo.addEventListener('click', ()=> sections.scrollIntoView({behavior:'smooth'}));
-    jump.addEventListener('click', ()=> sections.scrollIntoView({behavior:'smooth'}));
+  <footer class="small" style="text-align:center;padding:18px">© NAK!S</footer>
+</div>
 
-    // Theme toggle with glitch effect
-    const modeToggle = document.getElementById('modeToggle');
-    const root = document.documentElement;
-    const glitch = document.getElementById('glitch');
+<script>
+/* CONFIG: change to http://localhost:3000/upload-demo if server is separate */
+const UPLOAD_URL = '/upload-demo'; // change if needed, e.g. 'http://localhost:3000/upload-demo'
 
-    function applyMode(mode){
-      if(mode === 'light') root.classList.add('light'); else root.classList.remove('light');
+/* MODE TOGGLE with distortion + glitch */
+const modeToggle = document.getElementById('modeToggle');
+const distort = document.getElementById('distort');
+modeToggle.addEventListener('click', () => {
+  distort.classList.add('active');
+  setTimeout(() => {
+    document.documentElement.classList.toggle('light');
+    setTimeout(()=> distort.classList.remove('active'), 420);
+  }, 140);
+});
+
+/* scroll */
+document.getElementById('toContent').addEventListener('click', ()=>{
+  document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+});
+document.getElementById('logo').addEventListener('click', ()=> document.querySelector('.container').scrollIntoView({behavior:'smooth'}));
+
+/* timeline interactions */
+const dots = document.querySelectorAll('.dot');
+const detailBox = document.getElementById('detailBox');
+dots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    dots.forEach(d=>d.classList.remove('active'));
+    dot.classList.add('active');
+    detailBox.textContent = dot.dataset.detail;
+    detailBox.classList.add('show');
+  });
+  dot.addEventListener('mouseenter', ()=>{
+    dot.classList.add('active');
+    detailBox.textContent = dot.dataset.detail;
+    detailBox.classList.add('show');
+    // blur siblings
+    dots.forEach(d => { if (d !== dot) d.style.filter = 'blur(3px) grayscale(.6)'; });
+  });
+  dot.addEventListener('mouseleave', ()=>{
+    // if not clicked keep showing, else remove
+    if (!dot.classList.contains('active')) {
+      detailBox.classList.remove('show');
     }
+    dots.forEach(d => d.style.filter = '');
+  });
+});
 
-    function toggleMode(){
-      // add glitch overlay, then toggle
-      glitch.classList.add('active');
-      setTimeout(()=>{
-        if(root.classList.contains('light')) applyMode('dark'); else applyMode('light');
-        setTimeout(()=> glitch.classList.remove('active'), 420);
-      }, 160);
+/* parallax hero */
+document.addEventListener('mousemove', (e)=>{
+  const logo = document.querySelector('.logo');
+  const cx = window.innerWidth/2;
+  const cy = window.innerHeight/2;
+  const dx = (e.clientX - cx) / cx;
+  const dy = (e.clientY - cy) / cy;
+  logo.style.transform = `perspective(900px) rotateY(${dx * 6}deg) rotateX(${dy * -3}deg) translateZ(0)`;
+});
+
+/* Drop / Upload logic */
+const fileInput = document.getElementById('fileInput');
+const drop = document.getElementById('drop');
+const fileListEl = document.getElementById('fileList');
+const uploadBtn = document.getElementById('uploadBtn');
+const progressBar = document.getElementById('progressBar');
+const uploadStatus = document.getElementById('uploadStatus');
+
+let files = [];
+
+fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+drop.addEventListener('dragover', (e)=>{ e.preventDefault(); drop.style.transform='scale(1.01)'; });
+drop.addEventListener('dragleave', ()=>{ drop.style.transform=''; });
+drop.addEventListener('drop', (e)=>{ e.preventDefault(); drop.style.transform=''; addFiles(e.dataTransfer.files); });
+
+function addFiles(list){
+  const arr = Array.from(list).slice(0,3 - files.length);
+  for (const f of arr) {
+    if (f.size > 50 * 1024 * 1024) { alert('File ' + f.name + ' exceeds 50MB.'); continue; }
+    if (!f.type.startsWith('audio')) { alert('Only audio files allowed: ' + f.name); continue; }
+    files.push(f);
+  }
+  renderFiles();
+}
+
+function renderFiles(){
+  fileListEl.innerHTML = '';
+  files.forEach((f, i) => {
+    const el = document.createElement('div');
+    el.style.display = 'flex';
+    el.style.justifyContent = 'space-between';
+    el.style.padding = '8px';
+    el.style.borderRadius = '8px';
+    el.style.background = 'linear-gradient(90deg, rgba(255,255,255,0.02), transparent)';
+    el.innerHTML = `<div style="font-weight:700">${f.name}</div><div style="font-size:12px;color:var(--muted)">${(f.size/1024/1024).toFixed(2)} MB <button data-i="${i}" style="margin-left:8px" class="btn">✕</button></div>`;
+    fileListEl.appendChild(el);
+  });
+  // attach remove handlers
+  fileListEl.querySelectorAll('button').forEach(b => b.addEventListener('click', (e)=>{
+    const i = +e.currentTarget.dataset.i;
+    files.splice(i,1);
+    renderFiles();
+  }));
+}
+
+/* upload */
+uploadBtn.addEventListener('click', () => {
+  if (files.length === 0) return alert('Select at least one audio file.');
+  if (files.length > 3) return alert('Max 3 files.');
+  // gather form data
+  const form = document.getElementById('contactForm');
+  const formData = new FormData();
+  const name = form.name.value || '';
+  const email = form.email.value || '';
+  const title = form.title.value || '';
+  const message = form.message.value || '';
+  formData.append('name', name);
+  formData.append('email', email);
+  formData.append('title', title);
+  formData.append('message', message);
+  files.forEach(f => formData.append('demos', f));
+
+  // XMLHttpRequest to track progress reliably
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', UPLOAD_URL, true);
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const pct = Math.round((e.loaded / e.total) * 100);
+      progressBar.style.width = pct + '%';
+      uploadStatus.textContent = `Uploading ${pct}%`;
     }
-    modeToggle.addEventListener('click', ()=>{
-      // small extra visual: animate logo
-      logo.style.transform = 'scale(0.96) rotate(-1deg)';
-      setTimeout(()=> logo.style.transform = '', 260);
-      toggleMode();
-    });
-
-    // Mouse interactive parallax
-    document.addEventListener('mousemove', (e)=>{
-      const cx = window.innerWidth/2;
-      const cy = window.innerHeight/2;
-      const mx = (e.clientX - cx) / cx; // -1 .. 1
-      const my = (e.clientY - cy) / cy;
-      root.style.setProperty('--mx', (mx*30).toFixed(2));
-      root.style.setProperty('--my', (my*20).toFixed(2));
-
-      // subtle logo tilt
-      logo.style.transform = `perspective(800px) rotateY(${mx*6}deg) rotateX(${my*-3}deg)`;
-    });
-
-    // Timeline interaction
-    const dots = document.querySelectorAll('.dot');
-    const detailBox = document.getElementById('detailBox');
-    const timelineEl = document.getElementById('timeline');
-
-    function clearActive(){
-      dots.forEach(d=>d.classList.remove('active'));
-      timelineEl.classList.remove('blurred');
-    }
-
-    dots.forEach(dot=>{
-      dot.addEventListener('mouseenter', ()=>{
-        clearActive();
-        dot.classList.add('active');
-        timelineEl.classList.add('blurred');
-        const rect = dot.getBoundingClientRect();
-        const tRect = timelineEl.getBoundingClientRect();
-        // position detailBox centered under timeline
-        detailBox.innerText = dot.getAttribute('data-detail');
-        detailBox.style.left = Math.max(16, rect.left - tRect.left - 80) + 'px';
-        detailBox.classList.add('show');
-      });
-      dot.addEventListener('mouseleave', ()=>{
-        dot.classList.remove('active');
-        detailBox.classList.remove('show');
-        timelineEl.classList.remove('blurred');
-      });
-      dot.addEventListener('click', ()=>{
-        // Persist on click
-        const isActive = dot.classList.contains('active');
-        clearActive();
-        if(!isActive){
-          dot.classList.add('active');
-          timelineEl.classList.add('blurred');
-          detailBox.innerText = dot.getAttribute('data-detail');
-          detailBox.classList.add('show');
-        } else {
-          detailBox.classList.remove('show');
-        }
-      });
-    });
-
-    // Contact form handling (front-end only)
-    const form = document.getElementById('contactForm');
-    const contactMsg = document.getElementById('contactMsg');
-
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const data = new FormData(form);
-      contactMsg.textContent = 'Wysyłanie...';
-      // simulate send
-      setTimeout(()=>{
-        contactMsg.innerHTML = 'Dziękuję — wiadomość wysłana. Odpowiem na ' + (data.get('email') || 'podany adres');
-        form.reset();
-      }, 900);
-    });
-
-    // Drop demo area
-    const dropArea = document.getElementById('dropArea');
-    const fileInput = document.getElementById('fileInput');
-    const fileList = document.getElementById('fileList');
-    const sendDemo = document.getElementById('sendDemo');
-
-    let files = [];
-
-    function renderFiles(){
-      fileList.innerHTML = '';
-      files.forEach((f, idx)=>{
-        const el = document.createElement('div'); el.className='file-item';
-        el.innerHTML = `<div style=\"font-weight:700\">${f.name}</div><div style=\"font-size:12px;color:var(--muted)\">${(f.size/1024/1024).toFixed(2)} MB</div>`;
-        fileList.appendChild(el);
-      });
-    }
-
-    fileInput.addEventListener('change', (e)=>{
-      addFiles(e.target.files);
-    });
-
-    function addFiles(list){
-      const arr = Array.from(list).slice(0,3);
-      arr.forEach(f=>{
-        if(f.size > 50*1024*1024) return alert('Plik ' + f.name + ' przekracza 50MB.');
-        files.push(f);
-      });
-      renderFiles();
-    }
-
-    dropArea.addEventListener('dragover', (e)=>{e.preventDefault(); dropArea.style.transform='scale(1.01)';});
-    dropArea.addEventListener('dragleave', ()=>{dropArea.style.transform='';});
-    dropArea.addEventListener('drop', (e)=>{e.preventDefault(); dropArea.style.transform=''; addFiles(e.dataTransfer.files)});
-
-    sendDemo.addEventListener('click', ()=>{
-      if(files.length === 0) return alert('Wybierz pliki przed wysłaniem.');
-      if(files.length > 3) return alert('Maksymalnie 3 pliki.');
-      // simulate upload
-      sendDemo.disabled = true; sendDemo.textContent = 'Wysyłanie...';
-      setTimeout(()=>{
-        sendDemo.disabled = false; sendDemo.textContent = 'Wyślij demo';
-        alert('Demo przesłane (symulacja). Sprawdź e-mail do kontaktu.');
+  };
+  xhr.onload = () => {
+    progressBar.style.width = '0%';
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const res = JSON.parse(xhr.responseText || '{}');
+      if (res.ok) {
+        uploadStatus.textContent = 'Upload complete — thank you!';
         files = []; renderFiles();
-      }, 1200);
-    });
+      } else {
+        uploadStatus.textContent = 'Error: ' + (res.error || 'Unknown');
+      }
+    } else {
+      uploadStatus.textContent = 'Upload failed: ' + xhr.statusText;
+    }
+  };
+  xhr.onerror = () => { uploadStatus.textContent = 'Upload error'; progressBar.style.width = '0%'; };
 
-    // small accessibility: keyboard to skip to sections
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter' && document.activeElement === logo) sections.scrollIntoView({behavior:'smooth'});
-    });
+  // small UI lock
+  uploadBtn.disabled = true; uploadBtn.textContent = 'Sending...';
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      uploadBtn.disabled = false; uploadBtn.textContent = 'Send demo';
+    }
+  };
 
-    // set initial theme based on prefers-color-scheme
-    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    if(prefersLight) applyMode('light');
+  xhr.send(formData);
+});
 
-  </script>
+/* contact simple acknowledgement (not sending anywhere) */
+document.getElementById('contactForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  document.getElementById('contactAck').textContent = 'Saved locally (front-end). Fill out the form fields above when uploading to include metadata.';
+});
+</script>
 </body>
 </html>
