@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NAK!S — Producer</title>
+  <style>
+    :root {
+      --bg: #0b0b12;
+      --fg: #e6e7eb;
+      --muted: #a4a7b0;
+      --primary: #7a5cff;
+      --accent: #00e5ff;
+      --card: #131421;
+      --border: #23243a;
+      --glow: 0 0 30px rgba(122,92,255,0.25);
+      --cursor: rgba(122,92,255,0.65);
+      --cursor2: rgba(0,229,255,0.6);
+    }
+    [data-theme="light"] {
+      --bg: #f6f7fb;
+      --fg: #1c1e25;
+      --muted: #5c6270;
+      --primary: #5c4bff;
+      --accent: #00bcd4;
+      --card: #ffffff;
+      --border: #e2e6ef;
+      --glow: 0 0 24px rgba(92,75,255,0.25);
+      --cursor: rgba(92,75,255,0.65);
+      --cursor2: rgba(0,188,212,0.6);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; background:var(--bg); color:var(--fg); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; scroll-behavior:smooth; }
+
+    /* Audio-reactive vibe background */
+    .bg-grid {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(122,92,255,0.16), transparent 36%),
+        radial-gradient(circle at 80% 90%, rgba(0,229,255,0.14), transparent 42%),
+        linear-gradient(transparent 95%, rgba(255,255,255,0.03));
+      filter: saturate(1.05);
+      animation: pulse 8s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.02);opacity:.95} }
+
+    /* Custom subtle cursor */
+    .cursor, .cursor-tail {
+      position: fixed; left:0; top:0; width:14px; height:14px; border-radius:50%;
+      pointer-events: none; z-index: 1000; mix-blend-mode: screen;
+    }
+    .cursor { background: var(--cursor); box-shadow: 0 0 26px var(--cursor); transform: translate(-50%,-50%); }
+    .cursor-tail { width:28px; height:28px; background: radial-gradient(circle, var(--cursor2), transparent 60%); filter: blur(6px); transform: translate(-50%,-50%); opacity: .65; }
+
+    header {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.35), transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      max-width: 1100px; margin: 0 auto; padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-weight: 800; letter-spacing: 0.6px;
+    }
+    .logo-mark {
+      width: 28px; height: 28px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: var(--glow);
+      position: relative; overflow: hidden;
+    }
+    .logo-mark::after {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(circle at 60% 40%, rgba(255,255,255,0.2), transparent 50%);
+      mix-blend-mode: screen;
+    }
+    .controls { display:flex; align-items:center; gap:12px; }
+
+    .mode-toggle {
+      display: inline-flex; align-items: center; gap: 10px;
+      border: 1px solid var(--border); border-radius: 999px;
+      padding: 6px 12px; background: var(--card);
+      cursor: pointer; user-select: none; color: var(--muted);
+    }
+    .mode-toggle .dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: var(--glow);
+      transition: transform 0.25s ease;
+    }
+    .mode-toggle:hover .dot { transform: translateX(2px) scale(1.06); }
+
+    /* Hamburger */
+    .hamburger { width:28px; height:20px; position:relative; cursor:pointer; }
+    .hamburger span {
+      position:absolute; left:0; width:100%; height:3px; background:var(--fg); transition:0.3s;
+    }
+    .hamburger span:nth-child(1){ top:0; }
+    .hamburger span:nth-child(2){ top:8px; }
+    .hamburger span:nth-child(3){ top:16px; }
+    .hamburger.active span:nth-child(1){ transform:rotate(45deg); top:8px; }
+    .hamburger.active span:nth-child(2){ opacity:0; }
+    .hamburger.active span:nth-child(3){ transform:rotate(-45deg); top:8px; }
+
+    /* Dropdown menu */
+    .menu {
+      position: absolute; right: 20px; top: 60px; overflow: hidden;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      max-height: 0; transition: max-height 0.4s ease; box-shadow: var(--glow);
+    }
+    .menu.open { max-height: 300px; }
+    .menu a { display:block; padding:12px 20px; color:var(--fg); text-decoration:none; border-bottom:1px solid var(--border); }
+    .menu a:hover { background: rgba(122,92,255,0.2); }
+
+    main { position: relative; z-index: 1; }
+
+    /* Hero: title + CTA */
+    .hero {
+      max-width: 1100px; margin: 30px auto 20px; padding: 0 20px;
+    }
+    .hero-title { display:flex; justify-content:center; align-items:center; height: 46vh; }
+    #naksTitle {
+      font-size: clamp(64px, 12vw, 160px); font-weight: 900; letter-spacing: 6px; color: var(--fg);
+      text-shadow: 0 0 25px var(--primary), 0 0 50px var(--accent);
+      transition: text-shadow 0.1s ease;
+    }
+    .tagline { text-align:center; font-size: 18px; color: var(--muted); margin: 12px 0 22px; }
+    .cta-row { display:flex; justify-content:center; gap:12px; flex-wrap: wrap; }
+    .btn {
+      display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px;
+      border:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.04));
+      color: var(--fg); text-decoration: none; transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: var(--glow); }
+
+    /* Timeline reactive */
+    .timeline { max-width: 1100px; margin: 16px auto 40px; padding: 10px 20px 30px; }
+    .timeline-axis {
+      position: relative;
+      height: 6px; border-radius: 6px;
+      background: linear-gradient(90deg, rgba(122,92,255,0.25), rgba(0,229,255,0.25));
+      border: 1px solid var(--border);
+    }
+    .timeline-cursor {
+      position: absolute; top: -7px; width: 18px; height: 18px; border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, #fff, rgba(255,255,255,0.25));
+      box-shadow: var(--glow);
+      transform: translateX(0); transition: transform 0.05s linear; pointer-events: none; border: 1px solid rgba(255,255,255,0.25);
+    }
+    .timeline-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px;
+    }
+    .milestone {
+      border: 1px solid var(--border); border-radius: 14px; background: var(--card);
+      padding: 16px; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease;
+      position: relative;
+    }
+    .milestone:hover { transform: translateY(-3px); box-shadow: var(--glow); }
+    .milestone h3 { margin: 0 0 6px; font-size: 18px; }
+    .milestone p { margin: 0; color: var(--muted); font-size: 14px; }
+    .milestone .dot {
+      position: absolute; top: 12px; right: 12px;
+      width: 8px; height: 8px; border-radius: 50%; background: var(--primary);
+      box-shadow: 0 0 10px rgba(122,92,255,0.6); opacity: 0.6; transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    /* Links cards */
+    .links { max-width: 1100px; margin: 0 auto 70px; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card { border: 1px solid var(--border); border-radius: 18px; background: var(--card); padding: 20px; }
+    .card h2 { margin: 0 0 12px; font-size: 22px; }
+    .link-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .link {
+      display:flex; align-items:center; gap:10px; padding:12px; border-radius:12px;
+      border:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.04));
+      color: var(--fg); text-decoration:none; position:relative; overflow:hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease;
+    }
+    .link::after {
+      content:""; position:absolute; inset:0;
+      background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(122,92,255,0.15), transparent 40%);
+      opacity:0; transition: opacity 0.2s ease;
+    }
+    .link:hover { transform: translateY(-2px); box-shadow: var(--glow); border-color: rgba(122,92,255,0.45); }
+    .link:hover::after { opacity:1; }
+    .link .icon { width:18px; height:18px; border-radius:50%; background: linear-gradient(135deg, var(--primary), var(--accent)); box-shadow: var(--glow); }
+    .link .label { font-weight:600; }
+
+    footer { border-top: 1px solid var(--border); color: var(--muted); padding: 24px 20px 40px; text-align: center; }
+
+    /* Responsiveness */
+    @media (max-width: 920px) {
+      .timeline-grid { grid-template-columns: repeat(2, 1fr); }
+      .links { grid-template-columns: 1fr; }
+      .link-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .timeline-grid { grid-template-columns: 1fr; }
+      .link-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="cursor"></div>
+  <div class="cursor-tail"></div>
+
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="logo-mark" aria-hidden="true"></div>
+        <div>NAK!S</div>
+      </div>
+      <div class="controls">
+        <div class="mode-toggle" id="modeToggle" role="button" aria-label="Przełącz motyw">
+          <span>Dark / Light</span>
+          <div class="dot"></div>
+        </div>
+        <div class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+    <nav class="menu" id="menu">
+      <a href="#home">Home</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#socials">Social</a>
+      <a href="#streaming">Streaming</a>
+      <a href="#contact">Kontakt</a>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="hero-title">
+        <h1 id="naksTitle">NAK!S</h1>
+      </div>
+      <p class="tagline">Producent łączący puls klubów z intymnością słuchawek. Brzmienia jak neon, groove jak serce.</p>
+      <div class="cta-row">
+        <a class="btn" href="#timeline"><span class="icon"></span><span>Sprawdź timeline</span></a>
+        <a class="btn" href="#streaming"><span class="icon"></span><span>Posłuchaj teraz</span></a>
+        <a class="btn" href="#socials"><span class="icon"></span><span>Follow</span></a>
+      </div>
+    </section>
+
+    <section class="timeline" id="timeline" aria-label="Timeline">
+      <div class="timeline-axis" id="timelineAxis">
+        <div class="timeline-cursor" id="timelineCursor" style="left:0;"></div>
+      </div>
+      <div class="timeline-grid">
+        <article class="milestone" data-pos="0.12">
+          <div class="dot"></div>
+          <h3>Start: bedroom sessions</h3>
+          <p>Pierwsze szkice — analogowy szum, cyfrowe sny. Pierwsze sample, pierwsze noce bez snu.</p>
+        </article>
+        <article class="milestone" data-pos="0.35">
+          <div class="dot"></div>
+          <h3>Debiut EP</h3>
+          <p>Minimal, bass, glitch — emocje w 124 BPM. Pierwsze radio, pierwsze playlisty.</p>
+        </article>
+        <article class="milestone" data-pos="0.65">
+          <div class="dot"></div>
+          <h3>Współprace</h3>
+          <p>Feat’y i remiksy — krzyżujemy światy i gatunki. Zaskakujemy formą, nie gubimy duszy.</p>
+        </article>
+        <article class="milestone" data-pos="0.88">
+          <div class="dot"></div>
+          <h3>Live & nowe wydawnictwa</h3>
+          <p>Scena, światła, sety jak opowieści. Kolejne single i EP, jedno brzmienie — NAK!S.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="links" id="socials">
+      <div class="card">
+        <h2>Social — zostańmy w kontakcie</h2>
+        <div class="link-grid">
+          <a class="link" href="https://instagram.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">Instagram</span>
+          </a>
+          <a class="link" href="https://twitter.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">X / Twitter</span>
+          </a>
+          <a class="link" href="https://tiktok.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">TikTok</span>
+          </a>
+          <a class="link" href="https://youtube.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">YouTube</span>
+          </a>
+          <a class="link" href="https://facebook.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">Facebook</span>
+          </a>
+          <a class="link" href="mailto:contact@naks.music" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">Kontakt</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="card" id="streaming">
+        <h2>Streaming — słuchaj gdzie chcesz</h2>
+        <div class="link-grid">
+          <a class="link" href="https://open.spotify.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">Spotify</span>
+          </a>
+          <a class="link" href="https://music.apple.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">Apple Music</span>
+          </a>
+          <a class="link" href="https://soundcloud.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">SoundCloud</span>
+          </a>
+          <a class="link" href="https://bandcamp.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">Bandcamp</span>
+          </a>
+          <a class="link" href="https://deezer.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">Deezer</span>
+          </a>
+          <a class="link" href="https://tidal.com" target="_blank" rel="noopener">
+            <span class="icon"></span><span class="label">TIDAL</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    © NAK!S — brzmienia z krwi i neonów. Zbudowano z miłości do detalu.
+  </footer>
+
+  <script>
+    // Persisted Dark/Light mode
+    (function(){
+      const root = document.documentElement;
+      const toggle = document.getElementById('modeToggle');
+      const stored = localStorage.getItem('naks-theme');
+      if (stored) root.setAttribute('data-theme', stored);
+      toggle.addEventListener('click', () => {
+        const current = root.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('naks-theme', next);
+      });
+    })();
+
+    // Hamburger dropdown
+    (function(){
+      const hamburger = document.getElementById('hamburger');
+      const menu = document.getElementById('menu');
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        menu.classList.toggle('open');
+      });
+      // Close menu on nav click
+      menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hamburger.classList.remove('active'); menu.classList.remove('open');
+      }));
+    })();
+
+    // Reactive glow for title NAK!S
+    (function(){
+      const title = document.getElementById('naksTitle');
+      window.addEventListener('mousemove', e => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 2;
+        const y = (e.clientY / window.innerHeight - 0.5) * 2;
+        const glowX = x * 40;
+        const glowY = y * 40;
+        title.style.textShadow = `
+          ${glowX}px ${glowY}px 40px rgba(122,92,255,0.8),
+          ${-glowX}px ${-glowY}px 60px rgba(0,229,255,0.6),
+          0 0 90px rgba(122,92,255,0.4)
+        `;
+      });
+    })();
+
+    // Interactive timeline cursor + milestone glow
+    (function(){
+      const axis = document.getElementById('timelineAxis');
+      const cursor = document.getElementById('timelineCursor');
+      const milestones = Array.from(document.querySelectorAll('.milestone'));
+      const clamp = (x, min, max) => Math.max(min, Math.min(max, x));
+
+      function updateCursor(clientX) {
+        const rect = axis.getBoundingClientRect();
+        const x = clamp(clientX - rect.left, 0, rect.width);
+        cursor.style.transform = `translateX(${x - 9}px)`; // center dot
+        const progress = x / rect.width;
+
+        milestones.forEach(ms => {
+          const pos = parseFloat(ms.dataset.pos || '0.5');
+          const dist = Math.abs(progress - pos);
+          const intensity = clamp(1 - dist * 3, 0, 1);
+          ms.style.borderColor = `rgba(122,92,255,${0.2 + intensity * 0.6})`;
+          const dot = ms.querySelector('.dot');
+          if (dot) {
+            dot.style.opacity = 0.4 + intensity * 0.6;
+            dot.style.transform = `scale(${1 + intensity * 0.25})`;
+          }
+          ms.style.boxShadow = intensity > 0.6 ? 'var(--glow)' : 'none';
+        });
+      }
+      window.addEventListener('mousemove', (e) => updateCursor(e.clientX));
+      window.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) updateCursor(t.clientX); });
+      // init center
+      requestAnimationFrame(() => {
+        const rect = axis.getBoundingClientRect();
+        updateCursor(rect.left + rect.width * 0.5);
+      });
+    })();
+
+    // Animated radial hover effect for links based on cursor position
+    (function(){
+      const links = Array.from(document.querySelectorAll('.link'));
+      links.forEach(link => {
+        link.addEventListener('mousemove', (e) => {
+          const r = link.getBoundingClientRect();
+          const mx = ((e.clientX - r.left) / r.width) * 100;
+          const my = ((e.clientY - r.top) / r.height) * 100;
+          link.style.setProperty('--mx', `${mx}%`);
+          link.style.setProperty('--my', `${my}%`);
+        });
+      });
+    })();
+
+    // Subtle custom cursor movement with trailing glow
+    (function(){
+      const cursor = document.querySelector('.cursor');
+      const tail = document.querySelector('.cursor-tail');
+      let x = window.innerWidth / 2, y = window.innerHeight / 2;
+      let tx = x, ty = y;
+
+      function render(){
+        x += (tx - x) * 0.35; // lead follows quickly
+        y += (ty - y) * 0.35;
+        const tailX = x - (x - tx) * 0.6; // tail lags a bit
+        const tailY = y - (y - ty) * 0.6;
+        cursor.style.transform = `translate(${x - 7}px, ${y - 7}px)`;
+        tail.style.transform = `translate(${tailX - 14}px, ${tailY - 14}px)`;
+        requestAnimationFrame(render);
+      }
+      window.addEventListener('mousemove', (e) => { tx = e.clientX; ty = e.clientY; });
+      render();
+    })();
+  </script>
+</body>
+</html>
