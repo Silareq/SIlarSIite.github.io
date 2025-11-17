@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NAK!S - Music Producer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Bebas+Neue&family=Orbitron:wght@900&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              'sans': ['Montserrat', 'sans-serif'],
+              'display': ['Bebas Neue', 'sans-serif'],
+              'logo': ['Orbitron', 'sans-serif'],
+            },
+            colors: {
+              'neon-red': '#ff003c',
+              'dark-bg': '#0a0a0a',
+            },
+            keyframes: {
+              pulseGlow: {
+                '0%, 100%': { 
+                  transform: 'scale(1)',
+                  filter: 'drop-shadow(0 0 5px #ff003c) drop-shadow(0 0 10px #ff003c)',
+                },
+                '50%': { 
+                  transform: 'scale(1.05)',
+                  filter: 'drop-shadow(0 0 10px #ff003c) drop-shadow(0 0 20px #ff003c)',
+                },
+              },
+              fadeIn: {
+                '0%': { opacity: 0, transform: 'translateY(20px)' },
+                '100%': { opacity: 1, transform: 'translateY(0)' },
+              },
+              fly: {
+                '0%': { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                '100%': { transform: 'translateY(-200px) rotate(15deg)', opacity: 0 },
+              },
+              glitch: {
+                '0%, 100%': { transform: 'translate(0, 0)', textShadow: 'none' },
+                '20%': { transform: 'translate(-3px, 3px)', textShadow: '3px -3px 0 #ff003c, -3px 3px 0 #00e5e5' },
+                '40%': { transform: 'translate(3px, -3px)', textShadow: '-3px 3px 0 #ff003c, 3px -3px 0 #00e5e5' },
+                '60%': { transform: 'translate(-3px, -3px)', textShadow: '3px 3px 0 #ff003c, -3px -3px 0 #00e5e5' },
+                '80%': { transform: 'translate(3px, 3px)', textShadow: '-3px -3px 0 #ff003c, 3px 3px 0 #00e5e5' },
+              },
+              fadeInUp: {
+                  'from': { opacity: 0, transform: 'translateY(20px)' },
+                  'to': { opacity: 1, transform: 'translateY(0)' },
+              }
+            },
+            animation: {
+              'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+              'fade-in': 'fadeIn 1s ease-out forwards',
+              'fly-away': 'fly 1.5s ease-in forwards',
+              'glitch': 'glitch 400ms linear',
+              'fade-in-up': 'fadeInUp 0.5s ease forwards',
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      :root {
+        scroll-behavior: smooth;
+      }
+      .gradient-bg {
+        background: radial-gradient(600px at var(--x) var(--y), rgba(255, 0, 60, 0.15), transparent 80%);
+      }
+      body.overflow-hidden {
+        overflow: hidden;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-white dark:bg-dark-bg transition-colors duration-500">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
